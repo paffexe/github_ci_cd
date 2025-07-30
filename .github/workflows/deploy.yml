@@ -27,7 +27,11 @@ jobs:
           PORT: ${{ secrets.PORT }}
         run: |
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
-          ssh $USER@$HOST <<EOF
+          ssh $USER@$HOST <<'EOF'
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
             if [ ! -d $APP_DIR ]; then
               mkdir -p $APP_DIR
               git clone https://github.com/paffexe/github_ci_cd.git $APP_DIR
@@ -37,6 +41,7 @@ jobs:
               cd $APP_DIR
               git pull origin master
             fi
+
             npm install
             npm run build
             pm2 restart ci_cd_app_abdulaziz || pm2 start dist/main.js --name ci_cd_app_abdulaziz
